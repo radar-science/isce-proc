@@ -2,37 +2,11 @@
 
 This repository contains some code and notes to facilitate the SAR and InSAR processing using [ISCE2](https://github.com/isce-framework/isce2).
 
-### 1. Installation
+This is research code provided to you "as is" with NO WARRANTIES OF CORRECTNESS. Use at your own risk.
 
-#### a. Install ISCE-2 and MintPy
+### 1. [Installation](./docs/installation.md)
 
-[Here](https://github.com/yunjunz/conda_envs) is an example instruction to install both isce2 and mintpy in the same environment using conda. If you have GPU, we recommend using isce2 installation "option 2" there to leverage the GPU processing.
-
-#### b. Install `isce-proc`
-
-Download source code:
-
-```bash
-cd ~/tools
-git clone https://github.com/radarscilab/isce-proc.git
-```
-
-Setup path by adding the following to your config file, such as `.bashrc` or `.bash_profile` for `bash` users:
-
-```bash
-##-------------- isce-proc ----------------------------##
-export ISCE_PROC_HOME=~/tools/isce-proc
-export PYTHONPATH=${PYTHONPATH}:${ISCE_PROC_HOME}/src
-export PATH=${PATH}:${ISCE_PROC_HOME}/src/isce_proc
-```
-
-#### c. Test the installation
-
-```bash
-run_isce_stack.py -h
-```
-
-### 2. Stack processing with `run_isce_stack.py`
+### 2. ISCE2 stack processing with `run_isce_stack.py`
 
 This script implements the process outlined in the readme files of ISCE-2 [topsStack](https://github.com/isce-framework/isce2/blob/main/contrib/stack/topsStack/README.md) and [stripmapStack](https://github.com/isce-framework/isce2/blob/main/contrib/stack/stripmapStack/README.md), so that one could run the entire stack processing in one line. Inside the script, it 1) downloads the DEM; 2) call `stackSentinel.py` or `stackStripMap.py` to (download the orbit files for S1), generate the configuration and run files; 3) submit the run files one by one using `run.py` (with multiple processes if asked for).
 
