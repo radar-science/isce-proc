@@ -17,10 +17,10 @@ The processing parameters are controlled via a configuration file, in a similar 
 2. run `run_isce_stack.py` to generate the stack of interferograms.
    - create a configuration file using the template example from `run_isce_stack.py -h`, e.g. `AtacamaSenAT120.txt`
    - run `run_isce_isce.py AtacamaSenAT120.txt` to download DEM and orbit data, and prepare run files
-   - run `run_isce_isce.py AtacamaSenAT120.txt --run` to execute the run files
+   - run `run_isce_isce.py AtacamaSenAT120.txt --start 1` to execute the run files
 3. run `smallbaselineApp.py` from MintPy to generate the time-series.
 
 Notes:
 
 + Tested for Sentinel-1, ALOS and ALOS2 stripmap, NOT tested for other sensors/modes yet.
-+ It's recommended to use the exact same bounding box for both SSARA and topsStack to avoid potential descrepency between the downloaded S1 data and the needed S1 data.
++ It's recommended to use the exact same bounding box for both `SSARA` and `topsStack` to avoid potential descrepency between the downloaded S1 data and the needed S1 data.
