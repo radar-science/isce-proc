@@ -30,7 +30,7 @@ def create_parser():
 
     parser.add_argument('-i','--int', dest='int_file', type=str, required=True,
                         help='Path of the input interferogram file.')
-    parser.add_argument('-c','--coh', dest='coh_file', type=str, required=False,
+    parser.add_argument('-c','--cor', dest='cor_file', type=str, required=False,
                         help='Path of the input coherence (phase sigma) file.')
     parser.add_argument('-o','-u','--unw', dest='unw_file', type=str, required=True,
                         help='Path of the output unwrapped interferogram file.')
@@ -44,7 +44,7 @@ def create_parser():
     snaphu = parser.add_argument_group('SNAPHU', 'SNAPHU Configurations')
     snaphu.add_argument('--defo-max', dest='defo_max', type=float, default=2.0,
                         help='Maximum phase discontinuity likely in cycles. (default: %(default)s)')
-    snaphu.add_argument('--comp-max', dest='comp_max', type=int, default=20,
+    snaphu.add_argument('--max-comp', dest='max_comp', type=int, default=20,
                         help='Maximum number of connected component per tile. (default: %(default)s)')
     snaphu.add_argument('--init-only', dest='init_only', action='store_true',
                         help='Initialize-only mode. (default: %(default)s)')
@@ -62,7 +62,7 @@ def cmd_line_parse(iargs=None):
     parser = create_parser()
     inps = parser.parse_args(args=iargs)
 
-    for fname in [inps.int_file, inps.coh_file, inps.mask_file]:
+    for fname in [inps.int_file, inps.cor_file, inps.mask_file]:
         if fname and not os.path.isfile(fname):
             raise FileNotFoundError(f'No file found in: {fname}')
 
@@ -79,6 +79,9 @@ def mask_int_file(int_file, mask_file):
 
     # mask out pixels by setting to zero
     data[mask == 0] = 0
+
+    # mask out pixels with nan value, as it's not supported by snaphu
+    data[np.isnan(data)] = 0
 
     # write
     fbase, fext = os.path.splitext(int_file)
@@ -109,10 +112,10 @@ def main(iargs=None):
     elif inps.unwrap_method == 'snaphu':
         isce_utils.unwrap_snaphu(
             int_file=inps.int_file,
-            coh_file=inps.coh_file,
+            cor_file=inps.cor_file,
             unw_file=inps.unw_file,
             defo_max=inps.defo_max,
-            comp_max=inps.comp_max,
+            max_comp=inps.max_comp,
             init_only=inps.init_only,
             init_method=inps.init_method,
             cost_mode=inps.cost_mode,
