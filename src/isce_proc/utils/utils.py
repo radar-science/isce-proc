@@ -442,6 +442,9 @@ def prep_stack(iDict):
                 num_proc = np.floor(int(iDict['numProcess']) / num_thread).astype(int)
             iargs += ['--num_proc4topo', str(num_proc)]
 
+        if iDict['updateMode']:
+            iargs += ['--update']
+
         if iDict['paramIonFile']:
             iargs += ['--param_ion', iDict['paramIonFile'], '--num_connections_ion', iDict['numConnectionIon']]
 
