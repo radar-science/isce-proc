@@ -33,6 +33,7 @@ isce.auxDir             = ~/bak/aux/aux_cal/         #Directory with all aux   f
 isce.startDate          = none                       #[20140825 / no], auto for none (1st date)
 isce.endDate            = none                       #[20190622 / no], auto for none (last date)
 isce.numProcess4topo    = auto                       #auto for numProcess/OMP_NUM_THREADS. Max limited by no. of CPUs per node on server
+isce.updateMode         = yes                        #[yes / no], auto for yes
 ## ionospheric phase estimation
 ## copy $ISCE_STACK/topsStack/ion_param.txt to the local dir to turn ON iono
 isce.numConnectionIon   = 3                          #[int>=1], auto for 3
@@ -79,6 +80,7 @@ AUTO_DICT = {
     'isce.startDate'          : None,
     'isce.endDate'            : None,
     'isce.numProcess4topo'    : None,
+    'isce.updateMode'         : True,
     'isce.numConnection.Ion'  : '3',
     'isce.paramIonFile'       : None,
 
