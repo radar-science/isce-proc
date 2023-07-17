@@ -36,13 +36,15 @@ def create_parser():
                         help='Path of the output unwrapped interferogram file.')
     parser.add_argument('-m','--method', dest='unwrap_method', type=str,
                         choices={'icu', 'snaphu'}, default='snaphu',
-                        help='Phase unwrapping algorithm. (default: %(default)s)')
+                        help='Phase unwrapping algorithm (default: %(default)s).')
     parser.add_argument('--mask', dest='mask_file', type=str,
                         help='Path of an mask file to mask interferogram before PU,'
                              ' by setting the amplitude value to zero.')
+    parser.add_argument('--min-cor','--min-coherence', dest='min_coherence', type=float, default=0,
+                        help='Set a minimum coherence value to mask out low coherent pixels (default: %(default)s).')
 
     snaphu = parser.add_argument_group('SNAPHU', 'SNAPHU Configurations')
-    snaphu.add_argument('--defo-max', dest='defo_max', type=float, default=2.0,
+    snaphu.add_argument('--max-defo', dest='max_defo', type=float, default=2.0,
                         help='Maximum phase discontinuity likely in cycles. (default: %(default)s)')
     snaphu.add_argument('--max-comp', dest='max_comp', type=int, default=20,
                         help='Maximum number of connected component per tile. (default: %(default)s)')
@@ -70,18 +72,26 @@ def cmd_line_parse(iargs=None):
 
 
 ######################################################################################
-def mask_int_file(int_file, mask_file):
+def mask_int_file(int_file, msk_file, cor_file=None, min_coherence=0):
     """Mask int_file based on mask_file."""
     # read
-    print(f'masking out pixels using file: {mask_file}')
     data = readfile.read(int_file, datasetName='complex')[0]
-    mask = readfile.read(mask_file)[0]
+    mask = readfile.read(msk_file)[0]
 
     # mask out pixels by setting to zero
-    data[mask == 0] = 0
+    flag = mask == 0
+    data[flag] = 0
+    print(f'masking out pixels using file: {msk_file} ({np.sum(flag)} pixels)')
 
     # mask out pixels with nan value, as it's not supported by snaphu
     data[np.isnan(data)] = 0
+
+    # mask based on coherence threshold
+    if min_coherence > 0 and cor_file:
+        cor = readfile.read(cor_file)[0]
+        flag = cor < min_coherence
+        data[flag] = 0
+        print(f'masking out pixels with values < {min_coherence} in file: {cor_file} ({np.sum(flag)} pixels)')
 
     # write
     fbase, fext = os.path.splitext(int_file)
@@ -101,7 +111,12 @@ def main(iargs=None):
 
     # --mask option
     if inps.mask_file:
-        inps.int_file = mask_int_file(inps.int_file, inps.mask_file)
+        inps.int_file = mask_int_file(
+            int_file=inps.int_file,
+            msk_file=inps.mask_file,
+            cor_file=inps.cor_file,
+            min_coherence=inps.min_coherence,
+        )
 
     if inps.unwrap_method == 'icu':
         isce_utils.unwrap_icu(
@@ -114,7 +129,7 @@ def main(iargs=None):
             int_file=inps.int_file,
             cor_file=inps.cor_file,
             unw_file=inps.unw_file,
-            defo_max=inps.defo_max,
+            max_defo=inps.max_defo,
             max_comp=inps.max_comp,
             init_only=inps.init_only,
             init_method=inps.init_method,
