@@ -18,7 +18,9 @@ from isce_proc.utils import config
 
 PARALLEL_STEPS = ['topo', 'geo2rdr', 'resamp']
 
-RESET_CMD_TOPS_STACK = ""
+RESET_CMD_TOPS_STACK = """
+rm -r ESD/ coarse_interferograms/ interferograms/ geom_reference/ merged/interferograms/*/fine* merged/interferograms/*/filt_fine.int
+"""
 RESET_CMD_STRIPMAP_STACK = """
 rm -r baselines/ configs/ coregSLC/ geom_reference/ Igrams/ merged/ offsets/ refineSecondaryTiming/ run_* SLC/ referenceShelve/
 cd download;  rm -rf 20* AL*;  mv ARCHIVED_FILES/* .;  cd ..
@@ -109,8 +111,6 @@ def check_template_auto_value(tempDict, autoDict=config.AUTO_DICT):
             values = glob.glob(tempDict[key])
             if len(values) > 0:
                 tempDict[key] = values[0]
-            else:
-                tempDict[key] = None
 
     return tempDict
 
@@ -223,7 +223,10 @@ def prep_dem(iDict):
 
     # DEM dir
     dir_orig = os.path.abspath(os.getcwd())
-    dem_dir = os.path.join(dir_orig, 'DEM')
+    if iDict['demFile']:
+        dem_dir = os.path.abspath(os.path.dirname(iDict['demFile']))
+    else:
+        dem_dir = os.path.join(dir_orig, 'DEM')
     os.makedirs(dem_dir, exist_ok=True)
 
     if iDict['demFile'] and os.path.isfile(iDict['demFile']):
@@ -347,7 +350,7 @@ def prep_ALOS2(iDict):
     """
 
     # compose prep script
-    scp = os.path.expandvars('$ISCE_STACK/stripmapStack/prepRawALOS.py')
+    scp = os.path.expandvars('$ISCE_STACK/stripmapStack/prepSlcALOS2.py')
     cmd = f'{scp} -i ./download -o ./SLC -t ""'
     if iDict.get('ALOS2.polarization', None):
         cmd += ' --polarization {}'.format(iDict['ALOS2.polarization'])
