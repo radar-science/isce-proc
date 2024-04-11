@@ -443,6 +443,7 @@ def prep_stack(iDict):
             else:
                 num_thread = int(os.environ.get('OMP_NUM_THREADS',1))
                 num_proc = np.floor(int(iDict['numProcess']) / num_thread).astype(int)
+                num_proc = max(num_proc, 1)    # ensure the num_proc >= 1
             iargs += ['--num_proc4topo', str(num_proc)]
 
         if iDict['updateMode']:
