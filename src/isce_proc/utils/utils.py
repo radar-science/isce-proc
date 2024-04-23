@@ -369,6 +369,17 @@ def prep_ALOS2(iDict):
     return
 
 
+def dload_s1_orbit(iDict):
+    """Download Sentinel-1 orbits using sentineleof."""
+    cmd = f'eof --search-path {os.path.abspath("./SLC")} --save-dir {iDict["orbitDir"]} --force-asf'
+    status = subprocess.Popen(cmd, shell=True).wait()
+    if status != 0:
+        raise RuntimeError("Error in {}".format(sh_file))
+    print(f'finished downloading orbits with status {status}')
+
+    return
+
+
 def prep_stack(iDict):
     """Call stack*.py to generate run_files and config folders"""
 
