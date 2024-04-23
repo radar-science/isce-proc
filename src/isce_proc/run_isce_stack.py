@@ -115,9 +115,8 @@ def main(iargs=None):
     # prepare DEM
     iDict = utils.prep_dem(iDict)
 
-    # prepare RAW/SLC data (for stripmapStack only)
     if iDict['processor'] == 'stripmapStack':
-
+        # prepare RAW/SLC data
         if iDict['sensor'] == 'Alos':
             run_file = utils.prep_ALOS(iDict)
 
@@ -126,6 +125,10 @@ def main(iargs=None):
 
         else:
             raise ValueError('unsupported sensor: {}'.format(iDict['sensor']))
+
+    elif iDict['processor'] == 'topsStack':
+        # download Sentinel-1 orbits
+        utils.dload_s1_orbit(iDict)
 
     # prepare stack processing
     utils.prep_stack(iDict)
